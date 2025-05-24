@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat para Mi Jovita - WhatsApp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e5ddd5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            background-image: linear-gradient(rgba(229, 221, 213, 0.8), rgba(229, 221, 213, 0.8)), 
+                              url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+        }
+
+        .phone {
+            width: 350px;
+            height: 700px;
+            background-color: #f0f0f0;
+            border-radius: 40px;
+            border: 12px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background-color: #e5ddd5;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #075e54;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+            background-size: 412px 412px;
+        }
+
+        .message {
+            max-width: 70%;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            word-wrap: break-word;
+        }
+
+        .sent {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .time {
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        .input-area {
+            padding: 10px;
+            background-color: #f0f0f0;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-top: 1px solid #ddd;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .typing-input {
+            animation: typingAnimation 1s infinite;
+            border-right: 2px solid #075e54;
+        }
+
+        @keyframes typingAnimation {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        .heart {
+            color: red;
+            font-size: 18px;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-message {
+            max-width: 200px;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-message img {
+            width: 100%;
+            display: block;
+        }
+
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px;
+            font-size: 12px;
+        }
+
+        .phone-image {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        .phone-image svg {
+            margin-right: 3px;
+        }
+
+        .heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+        
+        .final-heart {
+            font-size: 150px;
+            color: #ff2d52;
+            animation: heartbeat 1.5s infinite;
+            text-shadow: 0 0 30px rgba(255, 45, 82, 0.8);
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="screen">
+            <div class="header">
+                <img src="img/perfiljovita.jpg" alt="Perfil">
+                <div class="header-info">
+                    <h2>Mi Jovita</h2>
+                    <p>en línea</p>
+                </div>
+            </div>
+            <div class="chat-container" id="chat">
+                <!-- Mensajes aparecerán aquí -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="message-input" placeholder="Escribe un mensaje..." readonly>
+            </div>
+        </div>
+    </div>
+    
+    <div class="heart-container" id="heart-container">
+        <div class="final-heart">❤️</div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat');
+        const messageInput = document.getElementById('message-input');
+        const heartContainer = document.getElementById('heart-container');
+        
+        // Variables de control
+        let typingInterval;
+        let sendInterval;
+        let messageCount = 0;
+        const maxMessages = 12; // Número total de mensajes antes de finalizar
+        let usedMessages = [];
+        let usedImages = [];
+        let isTyping = false;
+
+        // Mensajes de amor
+        const loveMessages = [
+            "Te amo más que a nada en este mundo ❤️",
+            "Eres lo mejor que me ha pasado 💕",
+            "Cada día a tu lado es un regalo 🎁",
+            "Tu sonrisa ilumina mi día ☀️",
+            "Eres mi persona favorita 🌌",
+            "No puedo dejar de pensar en ti 💭",
+            "Eres perfecta tal como eres 😍",
+            "Mi corazón late por ti 💓",
+            "Eres mi sueño hecho realidad 🌟",
+            "Quiero pasar mi vida contigo 💑",
+            "Mi Jovita hermosa 💖",
+            "Eres mi razón de ser 😊",
+            "Contigo quiero envejecer 🧓👵",
+            "Eres mi todo 💘",
+            "Nada me hace más feliz que tú 💝"
+        ];
+
+        // Imágenes locales
+        const imageUrls = [
+            "img/imag1.jpg",
+            "img/imag2.jpg",
+            "img/imag3.jpg"
+        ];
+
+        // Función para obtener mensaje aleatorio sin repetición consecutiva
+        function getRandomLoveMessage() {
+            let availableMessages = loveMessages.filter(msg => !usedMessages.includes(msg));
+            if (availableMessages.length === 0) {
+                usedMessages = [];
+                availableMessages = [...loveMessages];
+            }
+            
+            const randomMessage = availableMessages[Math.floor(Math.random() * availableMessages.length)];
+            usedMessages.push(randomMessage);
+            return randomMessage;
+        }
+
+        // Función para obtener imagen aleatoria sin repetición consecutiva
+        function getRandomImage() {
+            let availableImages = imageUrls.filter(img => !usedImages.includes(img));
+            if (availableImages.length === 0) {
+                usedImages = [];
+                availableImages = [...imageUrls];
+            }
+            
+            const randomImage = availableImages[Math.floor(Math.random() * availableImages.length)];
+            usedImages.push(randomImage);
+            return randomImage;
+        }
+
+        // Función para añadir mensaje al chat
+        function addMessage(text, isImage = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'sent');
+            
+            const now = new Date();
+            const timeString = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            if (isImage) {
+                messageDiv.innerHTML = `
+                    <div class="image-message">
+                        <img src="${text}" alt="Foto enviada">
+                        <div class="image-caption">Para ti, mi amor 💕</div>
+                        <div class="phone-image">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                <circle cx="12" cy="15" r="1"></circle>
+                            </svg>
+                            Enviado desde mi teléfono
+                        </div>
+                    </div>
+                    <div class="time">${timeString}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    ${text}
+                    <div class="time">${timeString}</div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Incrementar contador y verificar si es el último mensaje
+            messageCount++;
+            if (messageCount >= maxMessages) {
+                endConversation();
+            }
+        }
+
+        // Función para simular escritura
+        function simulateTyping(text, callback) {
+            if (isTyping) return;
+            isTyping = true;
+            
+            clearInterval(typingInterval);
+            messageInput.classList.add('typing-input');
+            messageInput.placeholder = "";
+            messageInput.value = "";
+            
+            let i = 0;
+            typingInterval = setInterval(() => {
+                if (i < text.length) {
+                    messageInput.value = text.substring(0, i + 1);
+                    i++;
+                } else {
+                    clearInterval(typingInterval);
+                    messageInput.classList.remove('typing-input');
+                    
+                    setTimeout(() => {
+                        callback();
+                        messageInput.value = "";
+                        messageInput.placeholder = "Escribe un mensaje...";
+                        isTyping = false;
+                    }, 500);
+                }
+            }, 50);
+        }
+
+        // Función para enviar mensaje automático
+        function sendAutoMessage() {
+            if (messageCount >= maxMessages) return;
+            
+            const sendImage = Math.random() > 0.7 && imageUrls.length > 0;
+            
+            if (sendImage) {
+                const image = getRandomImage();
+                simulateTyping("Foto enviada", () => {
+                    addMessage(image, true);
+                });
+            } else {
+                const message = getRandomLoveMessage();
+                simulateTyping(message, () => {
+                    addMessage(message);
+                });
+            }
+        }
+
+        // Función para finalizar la conversación
+        function endConversation() {
+            clearInterval(sendInterval);
+            clearInterval(typingInterval);
+            
+            // Mostrar corazón final después de un breve retraso
+            setTimeout(() => {
+                heartContainer.style.display = 'flex';
+                setTimeout(() => {
+                    heartContainer.style.opacity = '1';
+                }, 50);
+            }, 2000);
+        }
+
+        // Función para iniciar la conversación
+        function startConversation() {
+            simulateTyping("Hola mi amor ❤️", () => {
+                addMessage("Hola mi amor ❤️");
+                
+                setTimeout(() => {
+                    simulateTyping("Te extraño mucho hoy...", () => {
+                        addMessage("Te extraño mucho hoy...");
+                        
+                        // Iniciar envío automático de mensajes
+                        sendInterval = setInterval(() => {
+                            sendAutoMessage();
+                        }, 3000 + Math.random() * 5000); // 3-8 segundos entre mensajes
+                    });
+                }, 1500);
+            });
+        }
+
+        // Iniciar todo
+        window.onload = function() {
+            setTimeout(startConversation, 1000);
+        };
+    </script>
+</body>
+</html>
